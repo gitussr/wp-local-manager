@@ -55,6 +55,12 @@
   .eyebrow { color: var(--accent); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; font-size: 13px; }
   h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 6px 0 12px; }
   .lede { color: var(--muted); font-size: 18px; max-width: 680px; margin: 0; }
+  figure.shot { margin: 28px 0 0; text-align: center; }
+  figure.shot img {
+    display: block; max-width: 100%; height: auto; margin: 0 auto;
+    border-radius: 8px; box-shadow: 0 8px 28px rgba(0, 0, 0, .18);
+  }
+  figure.shot figcaption { color: var(--muted); font-size: 14px; margin-top: 12px; }
   a.repo { color: var(--accent); font-weight: 600; text-decoration: none; }
   a.repo:hover { text-decoration: underline; }
 
@@ -130,6 +136,12 @@
   </p>
   <p><a class="repo" href="https://github.com/gitussr/wp-local-manager">View on GitHub &middot; installation &amp; requirements in the README &rarr;</a></p>
 </header>
+
+<figure class="shot">
+  <img src="screenshot.png" width="736" height="599"
+       alt="The WP Local Manager window: server status with Start, Stop and Restart buttons, a form to create a new WordPress site, and a list of sites with Open site, Open admin, Open folder and Delete buttons">
+  <figcaption>The WP Local Manager window. The same features are also available as <code>wplm</code> terminal commands.</figcaption>
+</figure>
 
 <nav class="toc" aria-label="Contents">
   <strong>Contents</strong>
