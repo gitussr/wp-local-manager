@@ -8,6 +8,8 @@ wplm new myshop
 
 …checks everything, creates the folder, downloads and installs WordPress, creates the database, adds the Apache site and the `myshop.test` address, starts the servers, and opens the WordPress dashboard. It takes about 30 seconds.
 
+![The WP Local Manager window: server status with Start/Stop/Restart, a form to create a new WordPress site, and the list of sites with Open, Admin, Folder and Delete buttons](docs/screenshot.png)
+
 **Documentation:** [How it works: the tech stack explained](https://gitussr.github.io/wp-local-manager/)
 
 ---
