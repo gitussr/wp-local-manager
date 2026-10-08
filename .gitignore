@@ -1,0 +1,12 @@
+# Downloaded at runtime (WP-CLI + cached WordPress zip) - wplm fetches these itself
+tools/
+
+# Private, machine-specific: hosts-file copies, database dumps, saved PATH
+backups/
+
+# Generated from assets/app-icon.png by "wplm setup"
+assets/app-icon.ico
+
+# Private planning notes
+discussion.md
+final.md

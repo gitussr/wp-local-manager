@@ -1,0 +1,7 @@
+# Windows scripts keep Windows line endings; the Git Bash launcher needs Unix ones.
+*.ps1   text eol=crlf
+*.cmd   text eol=crlf
+*.conf  text eol=crlf
+bin/wplm text eol=lf
+*.png   binary
+*.ico   binary

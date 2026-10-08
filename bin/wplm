@@ -1,0 +1,3 @@
+#!/bin/sh
+# Lets you type "wplm" in Git Bash (Git Bash does not run .cmd files by bare name).
+exec powershell -NoProfile -ExecutionPolicy Bypass -File "$(cygpath -w "$(dirname "$0")/..")\\wplm.ps1" "$@"

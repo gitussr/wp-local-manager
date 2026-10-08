@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WP Local Manager Tech Stack</title>
+<style>
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --text: #1f2328;
+    --muted: #5d6470;
+    --border: #e2e0da;
+    --accent: #c94f1f;
+    --accent-soft: #fbeee7;
+    --code-bg: #f1efe9;
+    --ok: #1d7f45;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #16181c;
+      --surface: #1e2127;
+      --text: #e6e6e6;
+      --muted: #a0a6b0;
+      --border: #30343c;
+      --accent: #f07a45;
+      --accent-soft: #3a2419;
+      --code-bg: #262a31;
+      --ok: #4cc27f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #16181c;
+    --surface: #1e2127;
+    --text: #e6e6e6;
+    --muted: #a0a6b0;
+    --border: #30343c;
+    --accent: #f07a45;
+    --accent-soft: #3a2419;
+    --code-bg: #262a31;
+    --ok: #4cc27f;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.65 "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 40px 16px 80px; }
+
+  header { margin-bottom: 32px; }
+  .eyebrow { color: var(--accent); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; font-size: 13px; }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 6px 0 12px; }
+  .lede { color: var(--muted); font-size: 18px; max-width: 680px; margin: 0; }
+  a.repo { color: var(--accent); font-weight: 600; text-decoration: none; }
+  a.repo:hover { text-decoration: underline; }
+
+  nav.toc {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 20px; margin: 28px 0 40px;
+  }
+  nav.toc strong { display: block; margin-bottom: 6px; }
+  nav.toc ol { margin: 0; padding-left: 20px; columns: 2; column-gap: 32px; }
+  nav.toc a { color: var(--text); text-decoration: none; }
+  nav.toc a:hover { color: var(--accent); }
+  @media (max-width: 600px) { nav.toc ol { columns: 1; } }
+
+  section { margin: 48px 0; }
+  h2 { font-size: 24px; margin: 0 0 4px; scroll-margin-top: 16px; }
+  h2 .num { color: var(--accent); margin-right: 8px; }
+  h3 { font-size: 17px; margin: 24px 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 16px; }
+  p { margin: 10px 0; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 4px 0; }
+
+  code {
+    font-family: Consolas, "Cascadia Mono", monospace; font-size: .9em;
+    background: var(--code-bg); padding: 1px 6px; border-radius: 4px;
+    overflow-wrap: anywhere;
+  }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px; overflow-x: auto; font: 14px/1.5 Consolas, "Cascadia Mono", monospace;
+    margin: 14px 0;
+  }
+  pre code { background: none; padding: 0; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 20px; margin: 14px 0;
+  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 14px 0; }
+  .grid .card { margin: 0; }
+  .card h4 { margin: 0 0 6px; font-size: 16px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+
+  .why {
+    background: var(--accent-soft); border-left: 4px solid var(--accent);
+    border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 16px 0;
+  }
+  .why strong { color: var(--accent); }
+
+  .table-wrap { overflow-x: auto; margin: 14px 0; border: 1px solid var(--border); border-radius: 10px; }
+  table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 15px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--code-bg); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+
+  .tag {
+    display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px;
+    background: var(--code-bg); color: var(--muted); margin-right: 4px;
+  }
+
+  footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 56px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">WP Local Manager &middot; How it is built</div>
+  <h1>The tech stack, explained</h1>
+  <p class="lede">
+    What each part is, why it was chosen, and how the parts work together to create
+    WordPress sites at <code>http://name.test</code> without opening the Laragon app.
+  </p>
+  <p><a class="repo" href="https://github.com/gitussr/wp-local-manager">View on GitHub &middot; installation &amp; requirements in the README &rarr;</a></p>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <strong>Contents</strong>
+  <ol>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#powershell">The language: PowerShell 5.1</a></li>
+    <li><a href="#servers">The servers: Apache, PHP, MySQL</a></li>
+    <li><a href="#routing">How name.test reaches a folder</a></li>
+    <li><a href="#wordpress">WordPress: zip, WP-CLI, MySQL tools</a></li>
+    <li><a href="#gui">The window: Windows Forms</a></li>
+    <li><a href="#windows">Windows integration</a></li>
+    <li><a href="#practices">Engineering practices</a></li>
+    <li><a href="#files">Project files</a></li>
+    <li><a href="#commands">Command reference</a></li>
+    <li><a href="#reading">Where to start reading</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="overview">
+  <h2><span class="num">1</span>Overview</h2>
+  <p class="sub">One PowerShell program, two ways to use it, and a library of small files that each do one job.</p>
+<pre><code> You
+  |
+  +-- Window (WinForms)  --+
+  |                        +-->  wplm.ps1  (PowerShell 5.1)
+  +-- Terminal: wplm ... --+        |
+                                    +-- lib\Servers.ps1   --> httpd.exe, mysqld.exe, mysqladmin.exe
+                                    +-- lib\Hosts.ps1     --> Windows hosts file (+ UAC)
+                                    +-- lib\Vhost.ps1     --> Apache .conf files
+                                    +-- lib\WordPress.ps1 --> wordpress.org zip, WP-CLI, mysql.exe
+                                    +-- lib\Site.ps1      --> "new": runs all of the above in order
+                                    +-- lib\Manage.ps1    --> list / open / delete
+                                    +-- lib\Setup.ps1     --> PATH, shortcuts, icon, autostart</code></pre>
+  <p>
+    There's no database of our own, no web server of our own and nothing to install.
+    Everything used is either <strong>built into Windows</strong> or <strong>already part of Laragon</strong>.
+    WP Local Manager is the "conductor" that tells those existing pieces what to do, which is what
+    the Laragon app does too.
+  </p>
+</section>
+
+<!-- 2 -->
+<section id="powershell">
+  <h2><span class="num">2</span>The language: Windows PowerShell 5.1</h2>
+  <p class="sub">The scripting language built into every copy of Windows 10.</p>
+  <p>
+    PowerShell can do everything a <code>.bat</code> file does, but it also has real variables,
+    functions, error handling and objects. It also has direct access to <strong>.NET</strong>,
+    Microsoft's large library for Windows programs (files, processes, networking, windows, zip files and more).
+  </p>
+  <div class="why">
+    <strong>Why it was chosen:</strong> nothing to install (unlike Python or Node), it talks to
+    Windows directly (processes, registry, files, admin rights), and it uses very little
+    memory, which matters on a 6&nbsp;GB machine.
+  </div>
+
+  <h3>Key ideas you will see in the code</h3>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Idea</th><th>What it means</th><th>Where</th></tr>
+    <tr><td><strong>Dot-sourcing</strong><br><code>. "$PSScriptRoot\lib\Servers.ps1"</code></td>
+        <td>Loads another file's functions into the current script, like <code>&lt;script src&gt;</code> in HTML.</td>
+        <td>Top of <code>wplm.ps1</code></td></tr>
+    <tr><td><strong>Verb-Noun names</strong></td>
+        <td><code>Start-Apache</code>, <code>Remove-Vhost</code>, <code>Get-Sites</code>. PowerShell's naming style says what a function does.</td>
+        <td>Every lib file</td></tr>
+    <tr><td><strong>Objects, not text</strong></td>
+        <td>Functions return <code>[pscustomobject]@{ Name = ...; Url = ... }</code>, very much like a JavaScript object.</td>
+        <td><code>Get-WplmConfig</code>, <code>Get-Sites</code></td></tr>
+    <tr><td><strong>Error handling</strong></td>
+        <td><code>throw "message"</code> stops the work, and one <code>try / catch</code> in <code>wplm.ps1</code> prints it in red.</td>
+        <td><code>wplm.ps1</code></td></tr>
+    <tr><td><strong>Calling .NET directly</strong></td>
+        <td><code>[IO.File]::WriteAllText(...)</code>, <code>[System.Diagnostics.Process]::Start(...)</code></td>
+        <td><code>Hosts.ps1</code>, <code>Servers.ps1</code></td></tr>
+  </table>
+  </div>
+
+  <h3>Gotcha: the execution policy</h3>
+  <p>
+    By default, Windows PowerShell refuses to run <code>.ps1</code> script files. That's why
+    <code>bin\wplm.cmd</code> exists. It's a one-line batch file that starts PowerShell with
+    <code>-ExecutionPolicy Bypass</code> just for our script. It's also why only the <code>bin\</code>
+    folder is on your PATH: if the folder holding <code>wplm.ps1</code> were on PATH, PowerShell might
+    pick the <code>.ps1</code> and refuse to run it.
+  </p>
+</section>
+
+<!-- 3 -->
+<section id="servers">
+  <h2><span class="num">3</span>The servers: Laragon's programs, without Laragon</h2>
+  <p class="sub">Laragon is mostly a launcher. The real work is done by three separate programs.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h4>Apache <span class="tag">httpd.exe</span></h4>
+      <p>The web server. Listens on <strong>port 80</strong>, receives the browser's request and returns pages. Runs PHP for <code>.php</code> files.</p>
+    </div>
+    <div class="card">
+      <h4>PHP 8.3 <span class="tag">php.exe</span></h4>
+      <p>The language WordPress is written in. Loaded <em>inside</em> Apache as a module (<code>mod_php.conf</code>). We also run <code>php.exe</code> on its own to run WP-CLI.</p>
+    </div>
+    <div class="card">
+      <h4>MySQL 8.4 <span class="tag">mysqld.exe</span></h4>
+      <p>The database server on <strong>port 3306</strong>. All databases live in <code>C:\laragon\data\mysql-8.4</code>.</p>
+    </div>
+  </div>
+
+  <h3>Start, check, stop</h3>
+  <ul>
+    <li><strong>Start:</strong> run the <code>.exe</code> with the right options, hidden in the background
+      (<code>Start-Process -WindowStyle Hidden</code>). For MySQL, <code>--defaults-file=my.ini</code> tells it where the data folder is.</li>
+    <li><strong>Check</strong> in two ways:
+      (1) is the process running? (<code>Get-Process httpd</code>), and
+      (2) does it actually answer? This is a test connection to the port, or <code>mysqladmin ping</code> for MySQL.</li>
+    <li><strong>Stop:</strong> MySQL gets a <em>polite</em> <code>mysqladmin shutdown</code>, because a force-kill can damage tables.
+      Apache is simply ended; it holds no data that can be damaged.</li>
+    <li><strong>Never start twice:</strong> every start checks first, because a second copy fails with confusing errors.</li>
+  </ul>
+</section>
+
+<!-- 4 -->
+<section id="routing">
+  <h2><span class="num">4</span>How <code>myshop.test</code> reaches the right folder</h2>
+  <p class="sub">Two separate mechanisms work together. Neither needs Laragon running.</p>
+<pre><code>Browser: "http://myshop.test"
+   |
+   v  (1) hosts file:  127.0.0.1  myshop.test   ->  "that's this computer"
+Apache on port 80
+   |
+   v  (2) vhost file:  ServerName myshop.test  ->  DocumentRoot C:/laragon/www/myshop
+WordPress in C:\laragon\www\myshop</code></pre>
+
+  <div class="card">
+    <h4>(1) The hosts file</h4>
+    <p>
+      <code>C:\Windows\System32\drivers\etc\hosts</code>. Windows checks it <em>before</em> asking the internet
+      where a name lives. <code>127.0.0.1</code> always means "this computer". Only Administrators can edit it,
+      which is why you get one <strong>UAC</strong> prompt (the Windows "Yes/No" box). The code reruns itself as admin
+      for just that step, then reports back through a small temporary file. A backup is taken before every change.
+    </p>
+  </div>
+  <div class="card">
+    <h4>(2) The Apache virtual host</h4>
+    <p>
+      <code>C:\laragon\etc\apache2\sites-enabled\auto.myshop.test.conf</code>. One Apache serves many sites by
+      checking which name the browser asked for. We always run <code>httpd -t</code> (Apache's config check) before restarting,
+      because one bad file would take down <em>every</em> site. A new file that fails the check is deleted straight away.
+    </p>
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="wordpress">
+  <h2><span class="num">5</span>WordPress: zip download, WP-CLI and MySQL tools</h2>
+  <p class="sub">Three tools together replace Laragon's "Quick app" and the browser installer.</p>
+
+  <div class="table-wrap">
+  <table>
+    <tr><th>Tool</th><th>What it does here</th></tr>
+    <tr><td><strong>WordPress zip</strong><br>from wordpress.org</td>
+        <td>Downloaded, checked against its <strong>SHA-1 fingerprint</strong> (so a corrupted or tampered file is rejected),
+            cached in <code>tools\cache\</code> for the next site, then unpacked with .NET's built-in zip support.</td></tr>
+    <tr><td><strong>WP-CLI</strong><br><code>wp-cli.phar</code></td>
+        <td>The official WordPress command-line tool. A <code>.phar</code> is a whole PHP program packed into one file.
+            It writes <code>wp-config.php</code> and runs <code>wp core install</code>, the same work as clicking through WordPress's setup screens.
+            Also available directly: <code>wplm wp &lt;site&gt; &lt;command&gt;</code>.</td></tr>
+    <tr><td><strong>mysql.exe / mysqldump.exe</strong></td>
+        <td>MySQL's own command-line tools. They create and drop databases, and export the <code>.sql</code> backups made before a delete.</td></tr>
+  </table>
+  </div>
+
+  <div class="why">
+    <strong>A lesson from building it:</strong> the plan was for WP-CLI to download WordPress too. On Windows that failed,
+    because its unpacking code cut very long file names short. Reading the real error output and switching to the official
+    zip was the fix. That's normal engineering: plans meet reality, and you adjust.
+  </div>
+
+  <h3>What happens during <code>wplm new myshop</code></h3>
+  <ol>
+    <li><strong>Check</strong> the name, folder, database and Apache config. Nothing is changed if a check fails.</li>
+    <li><strong>Hosts line</strong> first, so the single UAC prompt comes at the start.</li>
+    <li><strong>Install WordPress:</strong> unzip, create the database, write <code>wp-config.php</code>, run the installer.</li>
+    <li><strong>Apache config:</strong> write the vhost and validate it.</li>
+    <li><strong>Start the servers</strong> if needed (Apache last, so it reads the new config once), then open the browser.</li>
+  </ol>
+  <p>If any step fails, everything that run created is removed again, so you can simply run it again.</p>
+</section>
+
+<!-- 6 -->
+<section id="gui">
+  <h2><span class="num">6</span>The window: Windows Forms (WinForms)</h2>
+  <p class="sub">.NET's classic way to build Windows desktop windows, usable straight from PowerShell.</p>
+  <p>If you know the DOM, WinForms will feel familiar:</p>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Web (what you know)</th><th>WinForms (what we used)</th></tr>
+    <tr><td><code>&lt;button&gt;</code>, <code>&lt;input&gt;</code>, <code>&lt;fieldset&gt;</code></td><td><code>Button</code>, <code>TextBox</code>, <code>GroupBox</code></td></tr>
+    <tr><td><code>btn.addEventListener('click', fn)</code></td><td><code>$btn.Add_Click({ ... })</code></td></tr>
+    <tr><td><code>setInterval(fn, 2000)</code></td><td><code>Windows.Forms.Timer</code> with <code>Interval = 2000</code></td></tr>
+    <tr><td>a <code>&lt;table&gt;</code></td><td><code>ListView</code> in "Details" view</td></tr>
+  </table>
+  </div>
+
+  <h3>The key design choice</h3>
+  <p>
+    The window doesn't do the work itself. Each button runs the normal <code>wplm</code> command
+    in its own console window. That means:
+  </p>
+  <ul>
+    <li>The terminal and the window can never behave differently, because they share the same code.</li>
+    <li>The UAC prompt and the "type the name to delete" check keep working.</li>
+    <li>You can watch exactly what's happening.</li>
+  </ul>
+  <h3>Auto-refresh</h3>
+  <p>
+    Every 2 seconds the window builds a cheap "fingerprint" of what's on disk: the folder names in <code>www</code>,
+    the Apache config file names, and the hosts file's timestamp. It reloads the site list only when that fingerprint changes.
+    It also reloads as soon as a running command writes its "done" file, without waiting for you to close the console.
+  </p>
+</section>
+
+<!-- 7 -->
+<section id="windows">
+  <h2><span class="num">7</span>Windows integration</h2>
+  <p class="sub">All in <code>lib\Setup.ps1</code>. Per-user, needs no admin, and fully reversible with <code>wplm setup remove</code>.</p>
+  <div class="grid">
+    <div class="card">
+      <h4>PATH</h4>
+      <p>The list of folders Windows searches when you type a command. <code>bin\</code> was added by editing the registry value directly, so your existing <code>%USERPROFILE%</code> entry was kept intact.</p>
+    </div>
+    <div class="card">
+      <h4>Shortcuts</h4>
+      <p><code>.lnk</code> files on the Desktop and in the Start Menu, created through <code>WScript.Shell</code>, an old but reliable Windows component.</p>
+    </div>
+    <div class="card">
+      <h4>Icon</h4>
+      <p>An <code>.ico</code> file is a container holding one picture at several sizes (16 to 256&nbsp;px). It is built byte by byte from <code>assets\app-icon.png</code>.</p>
+    </div>
+    <div class="card">
+      <h4>Autostart</h4>
+      <p>An optional shortcut in your Startup folder, which Windows runs at every login. Off by default, because <code>new</code> and <code>open</code> start the servers anyway.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section id="practices">
+  <h2><span class="num">8</span>Engineering practices built in</h2>
+  <p class="sub">These matter more than any single technology.</p>
+  <div class="grid">
+    <div class="card"><h4>Check before you change</h4><p><code>wplm new</code> checks everything first, so a refusal leaves nothing half-made.</p></div>
+    <div class="card"><h4>Make undo possible</h4><p>Hosts-file backups, a database export before delete, the Recycle Bin instead of permanent deletion, and automatic cleanup when <code>new</code> fails.</p></div>
+    <div class="card"><h4>Discover, don't hard-code</h4><p>Version folders like <code>mysql-8.4.3-winx64</code> are found automatically, so a Laragon upgrade won't break anything.</p></div>
+    <div class="card"><h4>Test against reality</h4><p>Every step was run against the real setup, including breaking things on purpose to prove the safety nets work.</p></div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section id="files">
+  <h2><span class="num">9</span>Project files</h2>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Path</th><th>Purpose</th></tr>
+    <tr><td><code>wplm.ps1</code></td><td>The main program: reads the command and calls the right functions.</td></tr>
+    <tr><td><code>wplm-gui.ps1</code></td><td>The WP Local Manager window.</td></tr>
+    <tr><td><code>bin\wplm.cmd</code>, <code>bin\wplm</code></td><td>Small launchers for cmd/PowerShell and Git Bash. This folder is on PATH.</td></tr>
+    <tr><td><code>lib\Config.ps1</code></td><td>Finds Laragon's Apache, MySQL and PHP folders.</td></tr>
+    <tr><td><code>lib\Servers.ps1</code></td><td>Start, stop and status of Apache and MySQL.</td></tr>
+    <tr><td><code>lib\Hosts.ps1</code></td><td>Hosts file add/remove, with backup and UAC.</td></tr>
+    <tr><td><code>lib\Vhost.ps1</code></td><td>Apache vhost files, with the <code>httpd -t</code> safety check.</td></tr>
+    <tr><td><code>lib\WordPress.ps1</code></td><td>WordPress zip, WP-CLI, database creation.</td></tr>
+    <tr><td><code>lib\Site.ps1</code></td><td><code>wplm new</code>: the whole flow, with cleanup on failure.</td></tr>
+    <tr><td><code>lib\Manage.ps1</code></td><td><code>list</code>, <code>open</code>, <code>delete</code>.</td></tr>
+    <tr><td><code>lib\Setup.ps1</code></td><td>PATH, shortcuts, icon, autostart.</td></tr>
+    <tr><td><code>templates\vhost.conf</code></td><td>The Apache config template (Laragon's own format).</td></tr>
+    <tr><td><code>assets\app-icon.png</code></td><td>The app icon. Replace it and run <code>wplm setup</code> to change the icon.</td></tr>
+    <tr><td><code>tools\</code></td><td>Downloaded at runtime: <code>wp-cli.phar</code> and the cached WordPress zip.</td></tr>
+    <tr><td><code>backups\</code></td><td>Hosts-file copies, database exports from deleted sites, and the PATH from before setup.</td></tr>
+  </table>
+  </div>
+</section>
+
+<!-- 10 -->
+<section id="commands">
+  <h2><span class="num">10</span>Command reference</h2>
+<pre><code>wplm new &lt;name&gt; [title]    Create a WordPress site at http://&lt;name&gt;.test (login admin / admin)
+wplm list                  Show all sites and whether each is fully set up
+wplm open &lt;name&gt; [admin]   Open a site (or its dashboard); starts servers if needed
+wplm delete &lt;name&gt;         Delete a site: database backed up, folder to Recycle Bin
+wplm gui                   Open the WP Local Manager window
+
+wplm status | start | stop | restart     Apache + MySQL
+
+wplm hosts list | add &lt;name&gt; | remove &lt;name&gt;
+wplm vhost list | add &lt;name&gt; | remove &lt;name&gt;
+wplm wp &lt;name&gt; &lt;wp-cli command...&gt;      e.g. wplm wp myshop plugin list
+
+wplm setup [remove]        PATH + Desktop / Start Menu shortcuts
+wplm autostart on | off    Start servers at Windows login
+wplm help                  Everything above</code></pre>
+</section>
+
+<!-- 11 -->
+<section id="reading">
+  <h2><span class="num">11</span>Where to start reading the code</h2>
+  <ol>
+    <li><code>lib\Servers.ps1</code>: the smallest file with real ideas (processes and ports).</li>
+    <li><code>lib\Hosts.ps1</code>: file editing done carefully, plus the admin-rights trick.</li>
+    <li><code>lib\Site.ps1</code>: how the pieces are put together, with cleanup on failure.</li>
+    <li><code>wplm-gui.ps1</code>: once those make sense, see how the window wraps them.</li>
+  </ol>
+</section>
+
+<footer>
+  WP Local Manager &middot; built with Windows PowerShell 5.1, .NET / Windows Forms, Apache, PHP, MySQL and WP-CLI,
+  reusing the servers installed by Laragon.
+  &middot; <a class="repo" href="https://github.com/gitussr/wp-local-manager">Source on GitHub</a>
+</footer>
+
+</div>
+</body>
+</html>
