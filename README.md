@@ -27,6 +27,7 @@ wplm new myshop
 - [Updating](#updating)
 - [Uninstalling](#uninstalling)
 - [Project structure](#project-structure)
+- [License](#license)
 
 ---
 
@@ -295,3 +296,11 @@ docs\               Documentation website (GitHub Pages)
 ```
 
 For a full explanation of how each part works, see the **[documentation](https://gitussr.github.io/wp-local-manager/)**.
+
+---
+
+## License
+
+[MIT](LICENSE). You're free to use, copy, modify and share this project, as long as the license notice is kept.
+
+Laragon, Apache, PHP, MySQL, WordPress and WP-CLI are separate projects under their own licenses. WP Local Manager doesn't include or modify them; it only runs the copies already installed on your computer.
