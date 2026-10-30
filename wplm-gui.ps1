@@ -22,6 +22,8 @@ $script:task = $null       # the console process currently running a command
 $script:taskName = ''
 $script:doneFile = $null   # the command writes its exit code here when its work is done
 $script:siteSignature = '' # quick fingerprint of sites on disk, to spot changes
+$script:apacheUp = $false  # last known server state, drives the Start/Stop/Restart buttons
+$script:mysqlUp = $false
 
 [System.Windows.Forms.Application]::EnableVisualStyles()
 $font = New-Object System.Drawing.Font('Segoe UI', 9)
@@ -56,6 +58,7 @@ function Start-WplmTask {
     $statusLabel.Text = "Running: $Label ..."
     $script:task = Start-Process powershell -PassThru -ArgumentList `
         "-NoProfile -ExecutionPolicy Bypass -File `"$wplm`" $Arguments --pause --done-file `"$script:doneFile`""
+    Update-ServerButtons
 }
 
 # A task is finished once it has written its done-file - which happens BEFORE
@@ -115,6 +118,19 @@ function Update-ServerLabels {
     $apacheLabel.ForeColor = if ($apacheUp) { 'ForestGreen' } else { 'Firebrick' }
     $mysqlLabel.Text = if ($mysqlUp) { 'MySQL:  RUNNING' } else { 'MySQL:  STOPPED' }
     $mysqlLabel.ForeColor = if ($mysqlUp) { 'ForestGreen' } else { 'Firebrick' }
+    $script:apacheUp = $apacheUp
+    $script:mysqlUp = $mysqlUp
+    Update-ServerButtons
+}
+
+# Only the buttons that would change something are clickable: Start while a
+# server is down, Stop/Restart while one is up. All three are off while a
+# command's console is still working.
+function Update-ServerButtons {
+    $busy = $null -ne $script:task
+    $startBtn.Enabled   = (-not $busy) -and -not ($script:apacheUp -and $script:mysqlUp)
+    $stopBtn.Enabled    = (-not $busy) -and ($script:apacheUp -or $script:mysqlUp)
+    $restartBtn.Enabled = $stopBtn.Enabled
 }
 
 function Update-SiteList {
